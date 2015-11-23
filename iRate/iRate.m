@@ -70,6 +70,7 @@ NSString *const iRateUserDidAttemptToRateApp = @"iRateUserDidAttemptToRateApp";
 NSString *const iRateUserDidDeclineToRateApp = @"iRateUserDidDeclineToRateApp";
 NSString *const iRateUserDidRequestReminderToRateApp = @"iRateUserDidRequestReminderToRateApp";
 NSString *const iRateDidOpenAppStore = @"iRateDidOpenAppStore";
+NSString *const iRateUserDidDislikeApp = @"iRateUserDidDislikeApp";
 
 static NSString *const iRateAppStoreIDKey = @"iRateAppStoreID";
 static NSString *const iRateRatedVersionKey = @"iRateRatedVersionChecked";
@@ -832,6 +833,11 @@ static NSString *const iRateMacAppStoreURLFormat = @"macappstore://itunes.apple.
     return [self.cancelButtonLabel length];
 }
 
+- (BOOL)showDislikeButton
+{
+    return [self.dislikeButtonLabel length];
+}
+
 - (void)promptForRating
 {
     if (!self.visibleAlert)
@@ -862,12 +868,20 @@ static NSString *const iRateMacAppStoreURLFormat = @"macappstore://itunes.apple.
                     [self didDismissAlert:alert withButtonAtIndex:1];
                 }]];
             }
+            
+            //dislike action
+            if ([self showDislikeButton])
+            {
+                [alert addAction:[UIAlertAction actionWithTitle:self.dislikeButtonLabel style:UIAlertActionStyleDefault handler:^(__unused UIAlertAction *action) {
+                    [self didDismissAlert:alert withButtonAtIndex:2];
+                }]];
+            }
 
             //remind action
             if ([self showRemindButton])
             {
                 [alert addAction:[UIAlertAction actionWithTitle:self.remindButtonLabel style:UIAlertActionStyleDefault handler:^(__unused UIAlertAction *action) {
-                    [self didDismissAlert:alert withButtonAtIndex:[self showCancelButton]? 2: 1];
+                    [self didDismissAlert:alert withButtonAtIndex:[self showCancelButton]? 3: 2];
                 }]];
             }
 
@@ -887,6 +901,11 @@ static NSString *const iRateMacAppStoreURLFormat = @"macappstore://itunes.apple.
             {
                 [alert addButtonWithTitle:self.cancelButtonLabel];
                 alert.cancelButtonIndex = 1;
+            }
+
+            if ([self showDislikeButton])
+            {
+                [alert addButtonWithTitle:self.dislikeButtonLabel];
             }
 
             if ([self showRemindButton])
@@ -911,6 +930,10 @@ static NSString *const iRateMacAppStoreURLFormat = @"macappstore://itunes.apple.
         alert.messageText = self.messageTitle;
         alert.informativeText = message;
         [alert addButtonWithTitle:self.rateButtonLabel];
+        if ([self showDislikeButton])
+        {
+            [alert addButtonWithTitle:self.dislikeButtonLabel];
+        }
         if ([self showCancelButton])
         {
             [alert addButtonWithTitle:self.cancelButtonLabel];
@@ -993,11 +1016,16 @@ static NSString *const iRateMacAppStoreURLFormat = @"macappstore://itunes.apple.
     //get button indices
     NSInteger rateButtonIndex = 0;
     NSInteger cancelButtonIndex = [self showCancelButton]? 1: 0;
-    NSInteger remindButtonIndex = [self showRemindButton]? cancelButtonIndex + 1: 0;
+    NSInteger dislikeButtonIndex = [self showDislikeButton]? cancelButtonIndex + 1: 0;
+    NSInteger remindButtonIndex = [self showRemindButton]? dislikeButtonIndex + 1: 0;
 
     if (buttonIndex == rateButtonIndex)
     {
         [self rate];
+    }
+    else if (buttonIndex == dislikeButtonIndex)
+    {
+        [self dislikeThisVersion];
     }
     else if (buttonIndex == cancelButtonIndex)
     {
@@ -1180,6 +1208,14 @@ static NSString *const iRateMacAppStoreURLFormat = @"macappstore://itunes.apple.
         //launch mac app store
         [self openRatingsPageInAppStore];
     }
+}
+
+- (void)dislikeThisVersion
+{
+    //log event
+    [self.delegate iRateUserDidDislikeApp];
+    [[NSNotificationCenter defaultCenter] postNotificationName:iRateUserDidDislikeApp
+                                                        object:nil];
 }
 
 @end
