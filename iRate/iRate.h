@@ -80,6 +80,7 @@ IRATE_EXTERN NSString *const iRateUserDidAttemptToRateApp;
 IRATE_EXTERN NSString *const iRateUserDidDeclineToRateApp;
 IRATE_EXTERN NSString *const iRateUserDidRequestReminderToRateApp;
 IRATE_EXTERN NSString *const iRateDidOpenAppStore;
+IRATE_EXTERN NSString *const iRateUserDidDislikeApp;
 
 
 typedef NS_ENUM(NSUInteger, iRateErrorCode)
@@ -103,6 +104,7 @@ typedef NS_ENUM(NSUInteger, iRateErrorCode)
 - (void)iRateUserDidRequestReminderToRateApp;
 - (BOOL)iRateShouldOpenAppStore;
 - (void)iRateDidOpenAppStore;
+- (void)iRateUserDidDislikeApp;
 
 @end
 
@@ -136,6 +138,7 @@ typedef NS_ENUM(NSUInteger, iRateErrorCode)
 @property (nonatomic, copy) NSString *cancelButtonLabel;
 @property (nonatomic, copy) NSString *remindButtonLabel;
 @property (nonatomic, copy) NSString *rateButtonLabel;
+@property (nonatomic, copy) NSString *dislikeButtonLabel;
 
 //debugging and prompt overrides
 @property (nonatomic, assign) BOOL useUIAlertControllerIfAvailable;
