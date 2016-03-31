@@ -1212,6 +1212,9 @@ static NSString *const iRateMacAppStoreURLFormat = @"macappstore://itunes.apple.
 
 - (void)dislikeThisVersion
 {
+    //ignore this version
+    self.declinedThisVersion = YES;
+
     //log event
     [self.delegate iRateUserDidDislikeApp];
     [[NSNotificationCenter defaultCenter] postNotificationName:iRateUserDidDislikeApp
